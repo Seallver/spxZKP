@@ -1,0 +1,8 @@
+/home/seallver/sphincsplus/target/release/deps/kat-38fe7d6143112ffb: tests/kat.rs
+
+/home/seallver/sphincsplus/target/release/deps/kat-38fe7d6143112ffb.d: tests/kat.rs
+
+tests/kat.rs:
+
+# env-dep:CARGO_MANIFEST_DIR=/home/seallver/sphincsplus
+# env-dep:SPHINCS_FAST_TEST=1
