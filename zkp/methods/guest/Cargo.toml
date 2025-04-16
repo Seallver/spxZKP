@@ -1,9 +1,9 @@
 [package]
-name = "guest_code_for_zk_proof"
+name = "vrfy"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
-[workspace]
 
 [dependencies]
+spx_sm3 = {path = "src/spx_module", features = ["sha2", "f128", "simple"]}
 risc0-zkvm = { version = "^2.0.1", default-features = false, features = ['std'] }

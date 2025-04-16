@@ -1,18 +1,31 @@
-#![no_main] 
-
 use risc0_zkvm::guest::env;
-risc0_zkvm::guest::entry!(main);
+use spx_sm3::*;
+
+pub const CRYPTO_MSG_BYTES: usize = 32;
 
 fn main() {
-    // Load the first number from the host
-    let a: u64 = env::read();
-    // Load the second number from the host
-    let b: u64 = env::read();
-    // Verify that neither of them are 1 (i.e. nontrivial factors)
-    if a == 1 || b == 1 {
-        panic!("Trivial factors")
-    }
-    // Compute the product while being careful with integer overflow
-    let product = a.checked_mul(b).expect("Integer overflow");
-    env::commit(&product);
+    // 从 host 接收 sig
+    let sig_vec: Vec<u8> = env::read();
+    let sig: [u8; CRYPTO_BYTES] = sig_vec.try_into().expect("Wrong length"); 
+    
+    // 从 host 接收 msg
+    let msg_vec: Vec<u8> = env::read();
+    let msg: [u8; CRYPTO_MSG_BYTES] = msg_vec.try_into().expect("Wrong length"); 
+    
+    // 从 host 接收 public key
+    let public_vec: Vec<u8> = env::read();
+    let public: [u8; CRYPTO_PUBLICKEYBYTES] = public_vec.try_into().expect("Wrong length");
+    
+    let secret: [u8; CRYPTO_SECRETKEYBYTES] = [0x00; 64];
+
+    // 构造 Keypair
+    let keys = Keypair {
+        public,
+        secret,
+    };
+
+    // 调用 verify 函数
+    let result = verify(&sig, &msg, &keys);
+    let valid = result.is_ok();
+    env::commit(&valid);
 }
