@@ -14,7 +14,6 @@ pub fn crypto_sign_verify(sig: &[u8], msg: &[u8], pk: &[u8]) -> Result<(), SigEr
   if sig.len() != SPX_BYTES {
     return Err(SigError::Input)
   }
-  return Ok(());
 
   let mut ctx = SpxCtx::default();
   let pub_root: &[u8] = &pk[SPX_N..];
