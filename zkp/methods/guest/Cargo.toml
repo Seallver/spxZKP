@@ -5,5 +5,5 @@ edition = "2024"
 
 
 [dependencies]
-spx_sm3 = {path = "src/spx_module", features = ["sha2", "f128", "simple"]}
+spx_sm3 = {path = "src/spx_module", features = ["sm3", "f128", "simple"]}
 risc0-zkvm = { version = "^2.0.1", default-features = false, features = ['std'] }

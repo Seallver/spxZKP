@@ -47,6 +47,7 @@
 //!   * `haraka`
 //!   * `sha2`
 //!   * `shake`
+//!   * `sm3`
 //! 
 //! * ### Security Level
 //!   * `f128`
@@ -77,7 +78,7 @@
 
 // Require one from each category 
 #![cfg(all(
-  any(feature = "sha2"),
+  any(feature = "sm3"),
   any(feature = "f128", feature = "f192", feature = "f256",
       feature = "s128", feature = "s192", feature = "s256"),
   any(feature = "robust", feature = "simple") 
@@ -94,7 +95,7 @@ macro_rules! assert_unique_feature {
     assert_unique_feature!($($rest),*);
   }
 }
-assert_unique_feature!("sha2");
+assert_unique_feature!("sm3");
 assert_unique_feature!("f128", "f192", "f256","s128", "s192", "s256");
 assert_unique_feature!("robust", "simple");
 
@@ -111,12 +112,11 @@ mod utils;
 mod wots;
 
 
+
 pub use api::*;
 
-#[cfg(feature = "sha2")] 
-mod sha2;
-
-pub use sign::*;
+#[cfg(feature = "sm3")] 
+mod sm3;
 
 pub use params::{
   CRYPTO_BYTES, 

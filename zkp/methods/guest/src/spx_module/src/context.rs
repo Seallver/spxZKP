@@ -4,7 +4,7 @@ use crate::params::SPX_N;
 pub struct SpxCtx {
   pub pub_seed: [u8; SPX_N],
   
-  #[cfg(feature="sha2")]
+  #[cfg(feature="sm3")]
   pub state_seeded: [u8; 40],
 }
 
@@ -13,7 +13,7 @@ impl Default for SpxCtx {
       Self { 
         pub_seed: [0u8; SPX_N], 
 
-        #[cfg(feature="sha2")]
+        #[cfg(feature="sm3")]
         state_seeded: [0u8; 40],
     }
   }

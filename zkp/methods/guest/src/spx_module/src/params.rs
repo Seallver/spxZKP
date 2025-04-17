@@ -72,7 +72,7 @@ pub const SPX_WOTS_LEN2: usize = if SPX_WOTS_W == 256 {
   }
 };
 
-pub const HASH: &str = "sha2";
+pub const HASH: &str = "sm3";
 
 pub const MODE: &str = if cfg!(feature = "s128") { "128s" }
 else if cfg!(feature = "f128") { "128f" } 

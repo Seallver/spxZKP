@@ -3,16 +3,6 @@ name = "spx_sm3"
 version = "0.2.0"
 edition = "2021"
 
-[dependencies]
-sha3 = { version = "0.10.8", optional = true }
-
-# Rename sha2 crate
-[dependencies.sha256]
-package = "sha2"
-version = "0.10.7"
-features = ["compress"]
-optional = true
-
 [dev-dependencies]
 pqc_core = {version = "0.3.0", features = ["load"]}
 
@@ -21,7 +11,7 @@ pqc_core = {version = "0.3.0", features = ["load"]}
 [features]
 
 ### Hash ###
-sha2 = ["sha256"]
+sm3 = []
 
 ### Security level ###
 # Considered equivalent to 128, 192 and 256 bit

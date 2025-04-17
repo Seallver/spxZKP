@@ -1,6 +1,5 @@
+#[cfg(feature = "sm3")]
+mod sm3; 
 
-#[cfg(feature = "sha2")]
-mod sha2; 
-
-#[cfg(feature = "sha2")]
-pub use sha2::*; 
+#[cfg(feature = "sm3")]
+pub use sm3::*; 
