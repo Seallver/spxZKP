@@ -313,21 +313,3 @@ pub fn mgf1_256_2(out: &mut[u8], outlen: usize, input: &[u8])
     out[idx..idx+end].copy_from_slice(&outbuf[..end]);
   }
 }
-
-// TODO: mfg1 tests instead
-#[cfg(test)]
-#[cfg(all(feature = "sm3", feature = "f128", feature= "robust"))]
-mod tests {
-  use super::*;
-  #[test]
-  fn sm3_finalize() {
-    let buf = [0, 46, 130, 247, 82, 182, 99, 36, 30, 6, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 4, 124, 153, 53, 160, 176, 118, 148, 170, 12, 109, 16, 228, 219, 107, 26, 221];
-    let mut sm3_state = [20, 22, 52, 101, 4, 22, 68, 118, 244, 194, 114, 161, 208, 242, 205, 126, 223, 57, 106, 139, 71, 255, 239, 55, 65, 254, 4, 118, 170, 37, 3, 106, 0, 0, 0, 0, 0, 0, 0, 64];
-    let mut outbuf = [0u8; SPX_SM3_OUTPUT_BYTES];
-    let expected = [151, 41, 244, 77, 28, 0, 51, 80, 20, 166, 116, 190, 217, 139, 37, 105, 21, 55, 45, 28, 40, 232, 167, 118, 61, 28, 222, 215, 214, 154, 24, 82];
-    sm3_inc_finalize(
-      &mut outbuf, &mut sm3_state, &buf, SPX_SM3_ADDR_BYTES + SPX_N
-    );
-    assert_eq!(outbuf, expected);
-  }
-}

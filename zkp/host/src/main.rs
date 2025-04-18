@@ -1,53 +1,78 @@
-use vrfy_methods::VRFY_ELF; // It is a binary file of multiply_method 
-use risc0_zkvm::{ 
-    default_prover, 
-    serde::from_slice, 
-    ExecutorEnv, 
-};
-use vrfy_methods::VRFY_ID; 
-use rand::Rng;
+use risc0_zkvm::{default_prover, ExecutorEnv};
+use serde::{Deserialize, Serialize};
+use std::fs;
+use vrfy_methods::{VRFY_ELF, VRFY_ID}; // It is a binary file of multiply_method
+
+#[derive(Debug, Serialize, Deserialize)]
+#[allow(non_snake_case)]
+pub struct Sm3Signature {
+    mlen: u32,
+    pk: String,  // Base64 编码的公钥
+    Sig: String, // Base64 编码的签名
+}
+
+pub const CHUNK :usize = 2048;
 
 fn main() {
-    // 伪造一个64字节的签名
-    let sig: Vec<u8> = rand::thread_rng()
-        .sample_iter(rand::distributions::Standard)
-        .take(17088)
-        .collect();
+    use base64::{engine::general_purpose, Engine as _};
 
-    // 伪造一个32字节的消息
-    let msg: Vec<u8> = vec![
-        99, 88, 77, 66, 55, 44, 33, 22,
-        11, 0, 9, 8, 7, 6, 5, 4,
-        3, 2, 1, 0, 1, 2, 3, 4,
-        5, 6, 7, 8, 9, 10, 11, 12
-    ];
+    let json_str = fs::read_to_string("./host/sig.json").unwrap();
+    let sig_: Sm3Signature = serde_json::from_str(&json_str).unwrap();
+    let pk_bytes = general_purpose::STANDARD.decode(&sig_.pk).unwrap();
+    let sig_bytes = general_purpose::STANDARD.decode(&sig_.Sig).unwrap();
 
-    // 伪造一个 Keypair（你必须确认这个结构和你定义的 Keypair 是一致的）
-    let public: Vec<u8> = vec![0xAA; 32];
+    let m_len: usize = sig_.mlen as usize;
+    let sm_len: usize = sig_bytes.len();
 
+    let pk = pk_bytes[..].to_vec();
+    let m = sig_bytes[sm_len - m_len..].to_vec(); // 消息部分
+    let sig = sig_bytes[..sm_len - m_len].to_vec(); // 签名部分
+
+    println!("sig len: {}", sig.len());
+    println!("msg len: {}", m.len());
+    println!("pk len: {}", pk.len());
+
+    // SPX的签名通常太长，选择分块发送
+    let lastchunk = sig.len() % CHUNK;
+    let send_times = if lastchunk != 0 {sig.len() / CHUNK + 1 } else {sig.len() / CHUNK};
+    
     // First, we construct an executor environment
-    let env = ExecutorEnv::builder()
-        .write(&sig).unwrap() // Passing the input params to environment so it can be used by gues proggram
-        .write(&msg).unwrap()
-        .write(&public).unwrap()
-        .build().unwrap();
+    let mut env = ExecutorEnv::builder(); // Passing the input params to environment so it can be used by gues proggram
+    
+    env.write(&m)
+    .unwrap()
+    .write(&pk)
+    .unwrap();
+    //分块发送签名
+    for t in 0..send_times {
+        if lastchunk != 0 && t == send_times - 1 {
+            env.write(&sig[CHUNK * t..CHUNK * t + lastchunk].to_vec()).unwrap(); 
+            break;
+        }
+        env.write(&sig[CHUNK * t..CHUNK * (t + 1)].to_vec()).unwrap();    
+    }
+    let env_= env.build().unwrap();
 
     // Obtain the default prover.
     let prover = default_prover();
 
     // Produce a proveinfo by proving the specified ELF binary.
-    let prove_info = prover.prove(env, VRFY_ELF).unwrap();
+    let prove_info = prover.prove(env_, VRFY_ELF).unwrap();
 
-    // Extract journal of receipt (ie output c, where c = a * b)
-    let c: u32 = from_slice(&prove_info.receipt.journal.bytes.as_slice()).unwrap();
+    let receipt = prove_info.receipt;
+
+    #[derive(serde::Deserialize)]
+    struct MyData {
+        res: u32 
+    }
+
+    // Extract journal of receipt
+    let c_data: Result<MyData, _> = receipt.journal.decode();
 
     // Print an assertion
-    println!(
-        "I know the verify of {}, and I can prove it!",
-        c
-    );
+    println!("I know the verify of {}, and I can prove it!", c_data.unwrap().res);
 
-    let _verification = match &prove_info.receipt.verify(VRFY_ID) {
+    let _verification = match &receipt.verify(VRFY_ID) {
         Ok(()) => println!("Proof is Valid"),
         Err(_) => println!("Something went wrong !!"),
     };
@@ -58,4 +83,5 @@ fn main() {
     print!("\tReserved Cycles: {}\n", prove_info.stats.reserved_cycles);
     print!("\tUser Cycles: {}\n", prove_info.stats.user_cycles);
     print!("\tTotal Cycles: {}\n", prove_info.stats.total_cycles);
+
 }

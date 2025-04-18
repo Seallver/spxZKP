@@ -60,3 +60,8 @@ pub fn verify(sig: &[u8], msg: &[u8], keypair: &Keypair) -> Result<(), SigError>
 {
   crypto_sign_verify(&sig, &msg, &keypair.public)
 }
+
+
+pub fn vrfy(sig: &[u8], msg: &[u8], pk: &[u8]) -> Result<(), SigError> {
+  crypto_sign_verify(&sig, &msg, &pk)
+}

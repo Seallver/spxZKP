@@ -17,7 +17,7 @@ pub use haraka::*;
 pub use sm3::*; 
 
 #[cfg(feature = "sha2")]
-mod sha2; 
+pub use sha2::*; 
 
 #[cfg(feature = "shake")]
 pub use shake::*; 

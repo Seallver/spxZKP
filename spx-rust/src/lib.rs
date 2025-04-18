@@ -126,10 +126,6 @@ mod sha2;
 #[cfg(feature = "haraka")] 
 mod haraka;
 
-// Known Answer Tests
-#[cfg(feature = "KAT")]
-pub use sign::*;
-
 pub use params::{
   CRYPTO_BYTES, 
   CRYPTO_PUBLICKEYBYTES, 

@@ -9,11 +9,14 @@ repository = "https://github.com/Argyle-Software/pqc_sphincsplus"
 license = "MIT OR Apache-2.0"
 categories = ["algorithms", "cryptography", "no-std"]
 keywords = ["sphincsplus", "sphincs+", "sphincs", "signature", "post-quantum"]
-exclude = ["tests/KAT/", ".github" ]
+exclude = [".github" ]
 
 [dependencies]
-rand = "0.8.5"
+rand = "0.8.2"
 sha3 = { version = "0.10.8", optional = true }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+base64 = "0.22.1"
 
 # Rename sha2 crate
 [dependencies.sha256]
@@ -59,8 +62,4 @@ s256 = []
 # cost of a purely heuristic security argument.
 simple = []
 robust = []
-
-# Exposes inner api methods
-# Do not use except for running test vectors
-KAT = []
 

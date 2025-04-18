@@ -7,4 +7,3 @@ pub const SPX_D: usize = 22;
 /// FORS tree dimensions.
 pub const SPX_FORS_HEIGHT: usize = 6;
 pub const SPX_FORS_TREES: usize = 33;
-
